@@ -4,7 +4,7 @@
 | ---         | ---         | ---   | ---          | ---   |
 | Pandas      | 587         | x73.4 | 1,132        | x29.0 |
 | Dataset     | 220         | x27.5 | 726          | x18.6 |
-| Geni        | 8           | x1.0  | 39           | x1    |
+| Geni        | 8           | x1.0  | 39           | x1.0  |
 
 # Machine
 
@@ -42,7 +42,7 @@ NUMA node0 CPU(s):               0-11
 
 ## RAM
 
-3 x 8GB of DDR4 RAM by Corsair:
+3 x 8GB of Corsair's DDR4 RAM:
 
 ```
 $ sudo dmidecode -t memory | grep -i speed
@@ -59,7 +59,31 @@ $ sudo dmidecode -t memory | grep -i speed
 
 ## SSD
 
-Write:
+```
+$ sudo hwinfo --disk
+97: PCI 00.0: 10600 Disk
+  [Created at block.245]
+  ...
+  Hardware Class: disk
+  Model: "Samsung Electronics NVMe SSD Controller SM981/PM981"
+  Vendor: pci 0x144d "Samsung Electronics Co Ltd"
+  Device: pci 0xa808 "NVMe SSD Controller SM981/PM981"
+  SubVendor: pci 0x144d "Samsung Electronics Co Ltd"
+  SubDevice: pci 0xa801
+  Driver: "nvme"
+  Driver Modules: "nvme"
+  Device File: /dev/nvme0n1
+  Device Files: /dev/nvme0n1, /dev/disk/by-id/nvme-Samsung_SSD_970_EVO_Plus_500GB_S4EVNG0M801407P, /dev/disk/by-id/nvme-eui.002538589150082c, /dev/disk/by-path/pci-0000:05:00.0-nvme-1
+  Device Number: block 259:0
+  BIOS id: 0x80
+  Geometry (Logical): CHS 476940/64/32
+  Size: 976773168 sectors a 512 bytes
+  Capacity: 465 GB (500107862016 bytes)
+  Config Status: cfg=new, avail=yes, need=no, active=unknown
+  Attached to: #67 (Non-Volatile memory controller)
+```
+
+Write speed:
 
 ```
 $ sync; dd if=/dev/zero of=tempfile bs=1M count=1024; sync
@@ -68,7 +92,7 @@ $ sync; dd if=/dev/zero of=tempfile bs=1M count=1024; sync
 1073741824 bytes (1.1 GB, 1.0 GiB) copied, 0.503625 s, 2.1 GB/s
 ```
 
-Read:
+Read speed:
 
 ```
 $ dd if=tempfile of=/dev/null bs=1M count=1024
