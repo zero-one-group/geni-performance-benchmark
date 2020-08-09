@@ -12,7 +12,7 @@
                          file-seq
                          (filter #(.endsWith (.toString %) "parquet"))
                          (map #(.toString %))
-                         ;(take 1)
+                         (take 1)
                          (map api/dataset)
                          (apply api/concat))]
       (-> dataframe
