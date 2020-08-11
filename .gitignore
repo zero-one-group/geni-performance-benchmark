@@ -1,3 +1,4 @@
+*.arrow
 *.parquet
 *.nippy
 *.nrepl-history
