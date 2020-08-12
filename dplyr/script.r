@@ -28,3 +28,6 @@ print(df)
 
 # 1 Part
 # Time difference of 7.683979 mins
+
+# 12 Parts
+# Time difference of 16.54721 mins
