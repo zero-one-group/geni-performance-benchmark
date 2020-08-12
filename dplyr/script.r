@@ -3,7 +3,7 @@ library(dplyr)
 
 main <- function () {
     files <- Sys.glob('/data/performance-benchmark-data/*.parquet')
-    dataframes <- lapply(files, function(x) { read_parquet(x) })
+    dataframes <- lapply(files[1:1], function(x) { read_parquet(x) })
     dataframe <- bind_rows(dataframes)
     start_time <- Sys.time()
     dataframe %>%
@@ -28,6 +28,10 @@ print(df)
 
 # 1 Part
 # Time difference of 7.683979 mins
+# Without Docker
+# Time difference of 7.343145 mins
 
 # 12 Parts
 # Time difference of 16.54721 mins
+# Without Docker
+# Time difference of 15.86956 mins
