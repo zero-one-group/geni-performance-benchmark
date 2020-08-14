@@ -4,7 +4,7 @@
 | ---                                  | ---         | ---   | ---          | ---   |
 | Pandas                               | 587         | x73.4 | 1,132        | x29.0 |
 | dplyr                                | 461         | x57.6 | 992          | x25.4 |
-| tech.ml.dataset (with tablecloth)    | 220         | x27.5 | 726          | x18.6 |
+| tablecloth                           | 48          | x6.0  | 153          | x3.9  |
 | tech.ml.dataset (optimised)          | 18          | x2.3  | 133          | x3.4  |
 | tech.ml.dataset (optimised by Chris) | 9           | x1.1  | 36           | x0.9  |
 | Geni                                 | 8           | x1.0  | 39           | x1.0  |
