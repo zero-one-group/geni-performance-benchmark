@@ -1,4 +1,4 @@
-(ns dataset.core
+(ns tablecloth.core
   (:require
     [clojure.java.io]
     [tech.v2.datatype.functional :as dfn]
@@ -12,7 +12,7 @@
                          file-seq
                          (filter #(.endsWith (.toString %) "parquet"))
                          (map #(.toString %))
-                         (take 1)
+                         ;(take 1)
                          (map api/dataset)
                          (apply api/concat))]
       (-> dataframe
@@ -22,17 +22,20 @@
                           :avg-basket-size #(dfn/mean (% "sales"))
                           :avg-price       #(dfn/mean (% "price"))
                           :n-transactions  api/row-count
-                          :n-visits        #(-> % (api/unique-by "date") api/row-count)
-                          :n-brands        #(-> % (api/unique-by "brand-id") api/row-count)
-                          :n-styles        #(-> % (api/unique-by "style-id") api/row-count)})
+                          :n-visits        #(count (distinct (% "date")))
+                          :n-brands        #(count (distinct (% "brand-id")))
+                          :n-styles        #(count (distinct (% "style-id")))}
+                         {:parallel? true})
           (api/write-nippy! "target/dataset-matrix.nippy.gz"))))
 
-  (api/shape (api/read-nippy "target/dataset-matrix.nippy.gz"))
+  ; 1 Part
+  ; Elapsed time: 47566.025084 msecs
+
+  ; 12 Parts
+  ; Elapsed time: 152630.228187 msecs
+
+  (def result (api/read-nippy "target/dataset-matrix.nippy.gz"))
+  (println result)
+  (api/shape result)
 
   true)
-
-; 1 Part
-; Elapsed time: 219932.091967 msecs => 220 secs
-
-; 12 Parts
-; Elapsed time: 726119.116533 msecs => 726 secs
