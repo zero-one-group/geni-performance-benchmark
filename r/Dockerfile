@@ -13,4 +13,6 @@ RUN R -e "install.packages(\"stringr\", repos=\"http://cran.us.r-project.org\")"
 
 RUN R -e "install.packages(\"dplyr\", repos=\"http://cran.us.r-project.org\")"
 
+RUN R -e "install.packages(\"data.table\", repos=\"http://cran.us.r-project.org\")"
+
 CMD ["R"]
