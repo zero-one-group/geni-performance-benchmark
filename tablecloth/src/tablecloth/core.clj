@@ -2,7 +2,8 @@
   (:require
     [clojure.java.io]
     [tech.v2.datatype.functional :as dfn]
-    [tablecloth.api :as api])
+    [tablecloth.api :as api]
+    [tablecloth.api.utils :as api-utils])
   (:gen-class))
 
 (comment
@@ -14,7 +15,7 @@
                          (map #(.toString %))
                          ;(take 1)
                          (map api/dataset)
-                         (apply api/concat))]
+                         (apply api-utils/parallel-concat))]
       (-> dataframe
           (api/add-or-replace-column "sales" #(dfn/* (% "price") (% "quantity")))
           (api/group-by "member-id")
@@ -32,7 +33,7 @@
   ; Elapsed time: 47566.025084 msecs
 
   ; 12 Parts
-  ; Elapsed time: 152630.228187 msecs
+  ; Elapsed time: 150885.977555 msecs
 
   (def result (api/read-nippy "target/dataset-matrix.nippy.gz"))
   (println result)
