@@ -1,16 +1,16 @@
 # Benchmark Results
 
-| Language        | Runtime (s)                          | N=2,000,000 | xGeni | N=24,000,000 | xGeni |
-| --              | ---                                  | ---         | ---   | ---          | ---   |
-| Python          | Pandas                               | 587         | x73.4 | 1,132        | x29.0 |
-| Julia (Parquet) | DataFrames                           | 461         | x57.6 | 992          | x25.4 |
-| R               | dplyr                                | 87          | x10.9 | 868          | x22.3 |
-| Clojure         | tablecloth                           | 48          | x6.0  | 151          | x3.9  |
-| R               | data.table                           | 28          | x3.5  | 143          | x3.7  |
-| Clojure         | tech.ml.dataset (optimised)          | 18          | x2.3  | 133          | x3.4  |
-| Julia (Feather) | DataFrames                           | 16          | x2.0  | 41           | x1.1  |
-| Clojure         | tech.ml.dataset (optimised by Chris) | 9           | x1.1  | 36           | x0.9  |
-| Clojure         | Geni                                 | 8           | x1.0  | 39           | x1.0  |
+| Language | Runtime (s)                          | N=2,000,000 | xGeni | N=24,000,000 | xGeni |
+| --       | ---                                  | ---         | ---   | ---          | ---   |
+| Python   | Pandas                               | 587         | x73.4 | 1,132        | x29.0 |
+| R        | dplyr                                | 461         | x57.6 | 992          | x25.4 |
+| Julia    | DataFrames (with Parquet)            | 87          | x10.9 | 868          | x22.3 |
+| Clojure  | tablecloth                           | 48          | x6.0  | 151          | x3.9  |
+| R        | data.table                           | 28          | x3.5  | 143          | x3.7  |
+| Clojure  | tech.ml.dataset (optimised)          | 18          | x2.3  | 133          | x3.4  |
+| Julia    | DataFrames (with Feather)            | 16          | x2.0  | 41           | x1.1  |
+| Clojure  | tech.ml.dataset (optimised by Chris) | 9           | x1.1  | 36           | x0.9  |
+| Clojure  | Geni                                 | 8           | x1.0  | 39           | x1.0  |
 
 # Machine
 
