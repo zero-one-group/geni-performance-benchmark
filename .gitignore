@@ -1,3 +1,5 @@
+*.parquet
+*.nrepl-port
 *.arrow
 *.parquet
 *.nippy
