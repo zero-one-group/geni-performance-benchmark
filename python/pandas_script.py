@@ -31,7 +31,7 @@ def write_matrix():
             'n-brands': len(grouped['brand-id'].unique()),
             'n-styles': len(grouped['style-id'].unique()),
         })))
-    matrix.to_parquet('target/pandas-matrix.parquet')
+    matrix.to_parquet('pandas-matrix.parquet')
 
 if __name__ == '__main__':
     write_matrix()
