@@ -1,4 +1,4 @@
-(ns dataset.optimized-by-chris
+(ns dataset.optmised-by-chris
   (:require
     [tech.v3.io :as io]
     [tech.v3.datatype.functional :as dfn]
@@ -91,10 +91,12 @@
                                             ds-reduce/bitmap-consumer)})
           ;;This is recommended but I didn't see a large result by setting it.
           {:map-initial-capacity 100000
+           ;;We do an in-place aggregation to allow the system to pass us finalized
+           ;;data without using an intermediate datastructure.
            :finalize-type
            (fn [member-id reduce-data]
              (let [summations (get reduce-data :summations)
-                   ;;Summations get saved to map with :n-elems and :value
+                   ;;Summations get saved to map with :n-elems and :sum
                    sales (get summations "sales")
                    price (get summations "price")
                    ;;bitmaps are just bitmaps
@@ -102,8 +104,8 @@
                    date (get bitmaps "date")
                    brand-id (get bitmaps "brand-id")
                    style-id (get bitmaps "style-id")
-                   n-sales (double (:value sales))
-                   n-price (double (:value price))
+                   n-sales (double (:sum sales))
+                   n-price (double (:sum price))
                    n-elems (long (:n-elems sales))
                    result {:member-id member-id
                            :total-spend n-sales
@@ -128,6 +130,8 @@
         colmap
         (->> first-record
              (map (fn [[k v]]
+                    ;;With a binary record type this operation could be nicer.
+                    ;;We create 'virtual' columns that we can randomly address into.
                     [k (case (casting/simple-operation-space (dtype/datatype v))
                          :int64 (dtype/make-reader
                                  :int64 n-results
@@ -138,6 +142,7 @@
                     (into {}))
         final-ds (ds/->dataset colmap)]
     (log/info "Writing result")
+    ;;Write coalescese the virtual columns into basic datastructures like arrays.
     (ds/write! final-ds "output.nippy")
     (log/info "finished!! :-)")
     final-ds))
