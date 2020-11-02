@@ -1,17 +1,26 @@
 # Benchmark Results
 
-| Language | Runtime (s)                          | N=2,000,000 | xGeni | N=24,000,000 | xGeni |
-| --       | ---                                  | ---         | ---   | ---          | ---   |
-| Python   | Pandas (with custom function)        | 587         | x73.4 | 1,132        | x29.0 |
-| R        | dplyr                                | 461         | x57.6 | 992          | x25.4 |
-| Julia    | DataFrames (with Parquet)            | 87          | x10.9 | 868          | x22.3 |
-| Clojure  | tablecloth                           | 48          | x6.0  | 151          | x3.9  |
-| R        | data.table                           | 28          | x3.5  | 143          | x3.7  |
-| Clojure  | tech.ml.dataset (optimised)          | 18          | x2.3  | 133          | x3.4  |
-| Julia    | DataFrames (with Feather)            | 16          | x2.0  | 41           | x1.1  |
-| Clojure  | tech.ml.dataset (optimised by Chris) | 9           | x1.1  | 36           | x0.9  |
-| Clojure  | Geni                                 | 8           | x1.0  | 39           | x1.0  |
-| Python   | Pandas (with builtin agg functions)  | 3           | x0.4  | 42           | x1.1  |
+### Parquet
+
+| Language | Library                              | N=2,000,000 (secs) | N=24,000,000 (secs) |
+| --       | ---                                  | ---                | ---                 |
+| Python   | Pandas (with custom agg function)    | 587                | 1,132               |
+| R        | dplyr                                | 461                | 992                 |
+| Julia    | DataFrames (with Parquet)            | 87                 | 868                 |
+| Clojure  | tablecloth                           | 48                 | 151                 |
+| R        | data.table                           | 28                 | 143                 |
+| Julia    | DataFrames (with Feather)            | 16                 | 41                  |
+| Clojure  | tech.ml.dataset (optimised)          | 9                  | 61                  |
+| Clojure  | Geni                                 | 8                  | 39                  |
+| Python   | Pandas (with builtin agg functions)  | 3                  | 42                  |
+| Clojure  | tech.ml.dataset (optimised by Chris) | 3                  | 8                   |
+
+### Other Data Formats
+
+| Language | Library                              | Format  | N=2,000,000 (secs) | N=24,000,000 (secs) |
+| --       | ---                                  | ---     | ---                | ---                 |
+| Julia    | DataFrames                           | Feather | 16                 | 41                  |
+| Clojure  | tech.ml.dataset (optimised by Chris) | Arrow   | 1                  | 7                   |
 
 # Machine
 
