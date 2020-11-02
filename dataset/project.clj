@@ -6,6 +6,7 @@
   :dependencies [[org.clojure/clojure "1.10.2-alpha1"]
                  [techascent/tech.ml.dataset "5.00-alpha-20"
                   :exclusions [org.apache.commons/commons-compress]]
+                 [com.climate/claypoole "1.1.4"]
                  [org.apache.parquet/parquet-hadoop "1.11.0"
                   :exclusions [commons-codec]]
                  ;;Hadoop has an insane amount of dependencies that are

@@ -2,15 +2,12 @@
   (:require
     [tech.v3.io :as io]
     [tech.v3.datatype.functional :as dfn]
-    [tech.v3.datatype :as dtype]
-    [tech.v3.datatype.casting :as casting]
     [tech.v3.dataset :as ds]
     [tech.v3.dataset.reductions :as ds-reduce]
     [tech.v3.dataset.utils :as utils]
     [tech.v3.libs.arrow :as arrow]
     [tech.v3.libs.parquet :as parquet]
-    [primitive-math :as pmath]
-    [clojure.tools.logging :as log])
+    [com.climate.claypoole :as cp])
   (:import [java.util Map HashMap Set HashSet Map$Entry List
             ArrayList]
            [java.util.concurrent ConcurrentHashMap]
@@ -27,6 +24,7 @@
 (utils/set-slf4j-log-level :info)
 
 
+
 (def files (->> (io/file "/data/performance-benchmark-data")
                          file-seq
                          (filter #(.endsWith ^String (.toString ^Object %) "parquet"))
@@ -41,8 +39,9 @@
 ;;into memory.
 (defn load-combined-parquet
   []
-  (->> files
-       (pmap #(ds/->dataset % {:column-whitelist required-columns}))))
+  ;;Use exactly 12 threads to load the parquet files.
+  (cp/pmap 12 #(ds/->dataset % {:column-whitelist required-columns})
+           files))
 
 
 ;;Writing the dataset out to a store where we can access everything even if it is
