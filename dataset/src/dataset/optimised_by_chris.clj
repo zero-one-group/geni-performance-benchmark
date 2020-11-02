@@ -59,93 +59,19 @@
   (arrow/stream->dataset-seq-inplace "../benchmark-data.arrow"))
 
 
-;;Tried a record..this had no effect...
-(defrecord Result [^long member-id
-                   ^double total-spend
-                   ^double avg-basket-size
-                   ^double avg-price
-                   ^long n-transactions
-                   ^long n-visits
-                   ^long n-brands
-                   ^long n-styles])
-
-
-(defn- aggregate-group-by
-  ^objects [ds-seq]
-  (let [_ (log/info "group-by")
-        results (ArrayList. 10000)]
-    (->> ds-seq
-         ;;Add the sales column to all datasets
-         (map #(assoc % "sales"
-                      (dfn/* (% "price")
-                             (% "quantity"))))
-         ;;group by using this reducer followed by this consumer fn.
-         (ds-reduce/group-by-column-aggregate
-          "member-id"
-          (ds-reduce/aggregate-reducer
-           {:summations (ds-reduce/double-reducer ["sales" "price"]
-                                                  ds-reduce/sum-consumer)
-            ;;Since date, brand-id, and style ID are all int32 quantities, it is
-            ;;safe to use a bitmap reducer
-            :unique (ds-reduce/long-reducer ["date" "brand-id" "style-id"]
-                                            ds-reduce/bitmap-consumer)})
-          ;;This is recommended but I didn't see a large result by setting it.
-          {:map-initial-capacity 100000
-           ;;We do an in-place aggregation to allow the system to pass us finalized
-           ;;data without using an intermediate datastructure.
-           :finalize-type
-           (fn [member-id reduce-data]
-             (let [summations (get reduce-data :summations)
-                   ;;Summations get saved to map with :n-elems and :sum
-                   sales (get summations "sales")
-                   price (get summations "price")
-                   ;;bitmaps are just bitmaps
-                   bitmaps (get reduce-data :unique)
-                   date (get bitmaps "date")
-                   brand-id (get bitmaps "brand-id")
-                   style-id (get bitmaps "style-id")
-                   n-sales (double (:sum sales))
-                   n-price (double (:sum price))
-                   n-elems (long (:n-elems sales))
-                   result {:member-id member-id
-                           :total-spend n-sales
-                           :avg-basket-size (pmath// n-sales (double n-elems))
-                           :avg-price (pmath// n-price (double n-elems))
-                           :n-transactions n-elems
-                           :n-visits (dtype/ecount date)      ;;roaring bitmap
-                           :n-brands (dtype/ecount brand-id)  ;;roaring bitmap
-                           :n-styles (dtype/ecount style-id)}]
-               (locking results
-                 (.add results result))))}))
-    (.toArray results)))
-
-
 (defn dataset-seq->group-by-aggregate
   [ds-seq]
-  (let [ary-data (aggregate-group-by ds-seq)
-        ;;Transpose result
-        _ (log/info "in-place transpose results")
-        n-results (alength ary-data)
-        first-record (first ary-data)
-        colmap
-        (->> first-record
-             (map (fn [[k v]]
-                    ;;With a binary record type this operation could be nicer.
-                    ;;We create 'virtual' columns that we can randomly address into.
-                    [k (case (casting/simple-operation-space (dtype/datatype v))
-                         :int64 (dtype/make-reader
-                                 :int64 n-results
-                                 (unchecked-long (get (aget ary-data idx) k)))
-                         :float64 (dtype/make-reader
-                                   :float64 n-results
-                                   (unchecked-double (get (aget ary-data idx) k))))]))
-                    (into {}))
-        final-ds (ds/->dataset colmap)]
-    (log/info "Writing result")
-    ;;Write coalescese the virtual columns into basic datastructures like arrays.
-    (ds/write! final-ds "output.nippy")
-    (log/info "finished!! :-)")
-    final-ds))
+  (-> (->> (map #(assoc % "sales" (dfn/* (% "price") (% "quantity"))) ds-seq)
+           (ds-reduce/group-by-column-agg
+            "member-id"
+            {:total-spend (ds-reduce/sum "sales")
+             :avg-basket-size (ds-reduce/mean "sales")
+             :avg-price (ds-reduce/mean "price")
+             :n-transactions (ds-reduce/row-count)
+             :n-visits (ds-reduce/count-distinct "date" :int32)
+             :n-brands (ds-reduce/count-distinct "brand-id" :int32)
+             :n-styles (ds-reduce/count-distinct "style-id" :int32)}))
+      (ds/write! "output.nippy")))
 
 
 (comment
@@ -158,6 +84,8 @@
 
   (time (def ignored (dataset-seq->group-by-aggregate
                       (load-combined-arrow))))
+
+  ;;32
 
   (time (def ignored (dataset-seq->group-by-aggregate
                       (take 1 (load-combined-arrow)))))
