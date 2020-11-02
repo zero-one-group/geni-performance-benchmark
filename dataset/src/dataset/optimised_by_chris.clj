@@ -24,11 +24,11 @@
 (utils/set-slf4j-log-level :info)
 
 
-
 (def files (->> (io/file "/data/performance-benchmark-data")
-                         file-seq
-                         (filter #(.endsWith ^String (.toString ^Object %) "parquet"))
-                         (map #(.toString ^Object %))))
+                file-seq
+                (filter #(.endsWith ^String (.toString ^Object %) "parquet"))
+                (map #(.toString ^Object %))))
+
 
 ;;This is a thing that geni gets you - spark dataframe systems detect the dependencies
 ;;and don't load data they do not need to load.
@@ -61,12 +61,17 @@
 (defn dataset-seq->group-by-aggregate
   [ds-seq]
   (-> (->> (map #(assoc % "sales" (dfn/* (% "price") (% "quantity"))) ds-seq)
+           ;;group-by-column-agg returns a new dataset with the columns named after
+           ;;the keys in the aggregation map.
            (ds-reduce/group-by-column-agg
             "member-id"
             {:total-spend (ds-reduce/sum "sales")
              :avg-basket-size (ds-reduce/mean "sales")
              :avg-price (ds-reduce/mean "price")
              :n-transactions (ds-reduce/row-count)
+             ;;Counting distinct when you know the the values fit in
+             ;;int32 space is far faster than counting distinct of arbitrary
+             ;;values due to RoaringBitmap's excellent implementation.
              :n-visits (ds-reduce/count-distinct "date" :int32)
              :n-brands (ds-reduce/count-distinct "brand-id" :int32)
              :n-styles (ds-reduce/count-distinct "style-id" :int32)}))
